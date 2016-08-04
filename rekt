@@ -1,0 +1,140 @@
+#!/usr/bin/env lua5.2
+
+--[[
+
+  rekt 0.0.1
+
+  A rektangle generator.  Accepts a string, a width and a height, and
+  outputs a rektangle of the given dimensions to the terminal.
+
+  Copyright (C) 2016 Phil Yeeles <phil@yeel.es>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see
+  <http://www.gnu.org/licenses/>.
+
+]]--
+
+function transpose(t) -- transpose a 2d table
+  local tp = {}
+  for i = 1, #t[1] do
+    tp[i] = {}
+    for j = 1, #t do
+      tp[i][j] = 96
+    end
+  end
+  for i = 1, #t do
+    for j = 1, #t[1] do
+      tp[j][i] = t[i][j]
+    end
+  end
+  return(tp)
+end
+
+function pingpong(s, n) -- generate n pingpongs of string s
+  local sv = s
+  local rev = s:reverse()
+  local out = {}
+
+  for i = 2, n do
+    if i%2 == 0 then
+      sv = sv .. rev:sub(2)
+    else
+      sv = sv .. s:sub(2)
+    end
+  end
+  for i = 1, #sv do
+    out[i] = sv:byte(i)
+  end
+
+  return out
+end
+
+function rekt(s, w, h) -- generate w * h array of rektangles
+  local r = {}
+  local len = #s
+  local rblank = {}
+
+  local wchars = len+((len-1)*(w-1))
+  local hchars = len+((len-1)*(h-1))
+
+  -- initialise blank row
+  for i = 1, wchars do
+    rblank[i] = 32
+  end
+
+  -- initialise table
+  for i = 1, hchars do
+    r[i] = rblank
+  end
+
+  local ah = pingpong(s, w)            -- horizontal pattern
+  local rah = pingpong(s:reverse(), w) -- inverted horizontal pattern
+  local av = pingpong(s, h)            -- vertical pattern
+  local rav = pingpong(s:reverse(), h) -- inverted vertical pattern
+
+  -- put in horizontals
+  r[1] = ah
+  r[len] = rah
+  for i = 2, h do
+    if i%2 == 0 then
+      r[len+((i-1)*(len-1))] = ah
+    else
+      r[len+((i-1)*(len-1))] = rah
+    end
+  end
+
+  -- put in verticals by transposing and doing horizontals again
+  local rp = transpose(r)
+  rp[1] = av
+  rp[len] = rav
+  for i = 2, w do
+    if i%2 == 0 then
+      rp[len+((i-1)*(len-1))] = av
+    else
+      rp[len+((i-1)*(len-1))] = rav
+    end
+  end
+  r = transpose(rp)
+
+  return r
+end
+
+function printrekt(c) -- print a rektangle array
+  local s = ""
+  for i = 1, #c do
+    for j = 1, #c[1] do
+      s = s .. string.char(c[i][j]) .. " "
+    end
+    s = s .. "\n\n"
+  end
+  print(s)
+end
+
+if ((#arg ~= 3) or
+    (type(arg[1]) ~= "string") or
+    (not(tonumber(arg[2]))) or
+    (not(tonumber(arg[3])))) then
+  print("Usage: rekt <STRING> <WIDTH> <HEIGHT>")
+  os.exit(-1)
+end
+
+if ((tonumber(arg[2]) < 1) or
+    (tonumber(arg[3]) < 1) or
+    (tonumber(arg[2])%1 ~= 0) or
+    (tonumber(arg[3])%1 ~= 0)) then
+  print("Width and height must be positive integers!")
+  os.exit(-1)
+end
+
+printrekt(rekt(arg[1], tonumber(arg[2]), tonumber(arg[3])))
