@@ -30,13 +30,13 @@ function pad(b)
   local cols = #b[1]
   local blankrow = {}
   for i = 0, cols+1 do
-    blankrow[i] = "."
+    blankrow[i] = "_"
   end
   b[0] = blankrow
   b[rows+1] = blankrow
   for i = 1, rows do
-    b[i][0] = "."
-    b[i][cols+1] = "."
+    b[i][0] = "_"
+    b[i][cols+1] = "_"
   end
 end
 
@@ -90,10 +90,10 @@ function update(b)
           end
         end
       end
-      if (b[i][j] == ".") and (neighbours == 3) then
+      if (b[i][j] == "_") and (neighbours == 3) then
         out[i][j] = "#"
       elseif (b[i][j] == "#") and ((neighbours < 2) or (neighbours > 3)) then
-        out[i][j] = "."
+        out[i][j] = "_"
       else
         out[i][j] = b[i][j]
       end
@@ -115,15 +115,6 @@ function boardtostring(b)
   end
   return out
 end
-
---[[ Test pattern
-t = {{".","#",".",".","."},
-     {".",".","#",".","."},
-     {"#","#","#",".","."},
-     {".",".",".",".","."},
-     {".",".",".",".","."}}
-pad(t)
-]]--
 
 if #arg ~= 3 then
   print("Usage: gol -p|-i <FILE> <GENS>")
@@ -149,9 +140,9 @@ else
   repeat
     if arg[1] == "-i" then
       local g = gen + 1000000000
-      print("echo \"" .. boardtostring(t) .. "\" > frame" .. g)
+      os.execute("echo \"" .. boardtostring(t) .. "\" > frame" .. g .. ".txt")
       -- NB: sdf doesn't have convert installed
-      print("convert frame" .. g .. " frame" .. g .. ".gif")
+      os.execute("convert frame" .. g .. ".txt frame" .. g .. ".gif")
     elseif arg[1] == "-p" then
       os.execute("sleep 0.1; clear")
       print(boardtostring(t))
@@ -162,8 +153,9 @@ else
     t = update(t)
     gen = gen + 1
   until (gen == tonumber(arg[3]))
+
   if arg[1] == "-i" then
-    print("gifsicle --delay=10 --loop frame*.gif > " .. arg[2] .. ".gif")
-    print("rm frame*")
+    os.execute("gifsicle --delay=10 --loop frame*.gif > " .. arg[2] .. ".gif")
+    os.execute("rm frame*")
   end
 end

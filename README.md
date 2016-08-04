@@ -7,14 +7,14 @@ run from the command line, so no need to explicitly invoke Lua.
 ## `gol`
 
 An implementation of Conway's Game of Life.  Accepts pattern files
-depicting a starting state with `.` representing a dead cell and `#`
+depicting a starting state with `_` representing a dead cell and `#`
 representing a live cell (see the example files in `gol_patterns/`)
 and generates a given number of generations.
 
 `gol` accepts two switches: `-p` tells `gol` to print the results to
 the terminal, whereas `-i` tells it to generate an animated GIF,
-`<INPUT_FILE>.gif`.  Note that `-i` is dependent upon ImageMagick
-being installed.
+`<INPUT_FILE>.gif`.  Note that `-i` is dependent upon ImageMagick and
+gifsicle being installed.
 
 **Example usage **(print the first 30 generations of `tumbler.gol` to
 the terminal)**:**
