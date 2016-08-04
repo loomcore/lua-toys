@@ -16,8 +16,8 @@ the terminal, whereas `-i` tells it to generate an animated GIF,
 `<INPUT_FILE>.gif`.  Note that `-i` is dependent upon ImageMagick and
 gifsicle being installed.
 
-**Example usage **(print the first 30 generations of `tumbler.gol` to
-the terminal)**:**
+**Example usage _(print the first 30 generations of `tumbler.gol` to
+the terminal)_:**
 
 `gol -p gol_patterns/tumbler.gol 30`
 
